@@ -1,7 +1,8 @@
 import telebot
 from dotenv import load_dotenv
 import os
-from handlers import start_handler, help_handler, admin_handler, user_handler, spotify_handler, youtube_handler, soundcloud_handler
+from handlers import start_handler, help_handler, admin_handler, user_handler
+from musicDownloader import spotify, youtube, soundcloud
 from handlers.message_filter_handler import register_handlers as register_filter_handlers
 from database.db_utils import init_db
 from utils.admin_utils import is_admin
@@ -21,8 +22,9 @@ start_handler.register_handlers(bot)
 help_handler.register_handlers(bot)
 admin_handler.register_handlers(bot)
 user_handler.register_handlers(bot)
-spotify_handler.register_handlers(bot)
-soundcloud_handler.register_handlers(bot)
+spotify.register_handlers(bot)
+soundcloud.register_handlers(bot)
+youtube.register_handlers(bot)
 
 # Реєструємо хендлер для фільтрації повідомлень
 register_filter_handlers(bot)

@@ -3,6 +3,7 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from telebot import TeleBot
 from urllib.parse import urlparse
+from proxyManager.proxyChecker import get_working_proxy  # Імпортуємо функцію для роботи з проксі
 
 # Ініціалізація пулу потоків для обробки кількох запитів одночасно
 executor = ThreadPoolExecutor(max_workers=5)  # Кількість одночасних запитів
@@ -30,10 +31,17 @@ def handle_soundcloud_message(bot, message):
     user_folder = f'downloads/{message.from_user.id}'
     os.makedirs(user_folder, exist_ok=True)
 
+    # Отримання робочого проксі
+    proxy = get_working_proxy()
+    if proxy is None:
+        bot.reply_to(message, "Не вдалося знайти робочий проксі. Спробуйте ще раз пізніше.")
+        return
+
     try:
         # Завантаження треків або плейлистів
         process = subprocess.Popen([
             'yt-dlp',
+            '--proxy', proxy,  # Додаємо параметр проксі
             '-x',
             '--audio-format', 'mp3',
             '--audio-quality', '320K',

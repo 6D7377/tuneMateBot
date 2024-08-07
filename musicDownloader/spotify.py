@@ -3,6 +3,7 @@ import subprocess
 from telebot import TeleBot
 from mutagen.easyid3 import EasyID3
 import re
+from proxyManager.proxyChecker import get_working_proxy  # Імпорт функції для роботи з проксі
 
 def register_handlers(bot):
     @bot.message_handler(func=lambda message: "spotify.com" in message.text)
@@ -29,9 +30,16 @@ def register_handlers(bot):
         user_folder = f'downloads/{message.from_user.id}'
         os.makedirs(user_folder, exist_ok=True)
 
+        # Отримання робочого проксі
+        proxy = get_working_proxy()
+        if proxy is None:
+            bot.reply_to(message, "Не вдалося знайти робочий проксі. Спробуйте ще раз пізніше.")
+            return
+
         # Запуск spotdl для завантаження з параметрами якості
         try:
-            process = subprocess.Popen(['spotdl', url, '--output', user_folder, '--bitrate', '320k'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            process = subprocess.Popen(['--proxy', proxy, 'spotdl', url, '--output', user_folder, '--bitrate', '320k'],
+                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = process.communicate()
 
             # Перевірка на помилки

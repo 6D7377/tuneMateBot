@@ -3,6 +3,7 @@ import subprocess
 import re
 from telebot import TeleBot
 from concurrent.futures import ThreadPoolExecutor
+from proxyManager.proxyChecker import get_working_proxy  # Імпортуємо функцію для роботи з проксі
 
 executor = ThreadPoolExecutor(max_workers=5)  # Кількість одночасних запитів
 
@@ -30,13 +31,20 @@ def handle_youtube_message(bot, message):
     user_folder = f'downloads/{message.from_user.id}'
     os.makedirs(user_folder, exist_ok=True)
 
+    # Отримання робочого проксі
+    proxy = get_working_proxy()
+    if proxy is None:
+        bot.reply_to(message, "Не вдалося знайти робочий проксі. Спробуйте ще раз пізніше.")
+        return
+
     # Отримання ідентифікатора плейлиста або альбому
     playlist_id = get_playlist_or_album_id(url) if "playlist" in url or "album" in url else None
 
     try:
         # Запуск yt-dlp для завантаження аудіо з параметрами якості
         process = subprocess.Popen([
-            'yt-dlp', 
+            'yt-dlp',
+            '--proxy', proxy,  # Додаємо параметр проксі
             '-x',  # Завантажити тільки аудіо
             '--audio-format', 'mp3',  # Формат аудіо
             '--audio-quality', '320K',  # Якість аудіо
