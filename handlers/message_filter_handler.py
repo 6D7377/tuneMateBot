@@ -1,6 +1,6 @@
-from handlers.spotify_handler import handle_spotify_message
-from handlers.youtube_handler import handle_youtube_message
-from handlers.soundcloud_handler import handle_soundcloud_message
+from musicDownloader.spotify import handle_spotify_message
+from musicDownloader.youtube import handle_youtube_message
+from musicDownloader.soundcloud import handle_soundcloud_message
 
 def is_valid_url(url):
     return url.startswith("https://")
