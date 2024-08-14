@@ -1,18 +1,11 @@
 # proxyChecker.py
 import requests
 
-proxyList = [
-    "dzqopjfj:y00oudxqek2u@45.127.248.127:5128",
-    "dzqopjfj:y00oudxqek2u@64.64.118.149:6732",
-    "dzqopjfj:y00oudxqek2u@157.52.253.244:6204",
-    "dzqopjfj:y00oudxqek2u@167.160.180.203:6754",
-    "dzqopjfj:y00oudxqek2u@166.88.58.10:5735",
-    "dzqopjfj:y00oudxqek2u@173.0.9.70:5653",
-    "dzqopjfj:y00oudxqek2u@45.151.162.198:6600",
-    "dzqopjfj:y00oudxqek2u@204.44.69.89:6342",
-    "dzqopjfj:y00oudxqek2u@173.0.9.209:5792",
-    "dzqopjfj:y00oudxqek2u@206.41.172.74:6634",
-]
+def load_proxies_from_file(filename):
+    """Читає список проксі з файлу."""
+    with open(filename, 'r') as file:
+        proxies = [line.strip() for line in file if line.strip()]
+    return proxies
 
 def check_proxy(proxy):
     proxies = {
@@ -25,9 +18,20 @@ def check_proxy(proxy):
     except requests.RequestException:
         return False
 
-def get_working_proxy():
+def get_working_proxy(proxy_list):
     """Повертає перший робочий проксі з списку."""
-    for proxy_candidate in proxyList:
+    for proxy_candidate in proxy_list:
         if check_proxy(proxy_candidate):
             return proxy_candidate
     return None
+
+def main():
+    proxy_list = load_proxies_from_file('proxy.txt')
+    working_proxy = get_working_proxy(proxy_list)
+    if working_proxy:
+        print(f"Робочий проксі: {working_proxy}")
+    else:
+        print("Не знайдено робочих проксі.")
+
+if __name__ == "__main__":
+    main()
